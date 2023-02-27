@@ -9,7 +9,8 @@
     "format": "eslint --cache --fix 'src/**/*.{js,jsx,ts,tsx}' && prettier --write 'src/**/*.{js,jsx,ts,tsx}'",
     "test": "jest",
     "build": "tsc",
-    "package": "ncc build --source-map --license licenses.txt"
+    "package": "ncc build --source-map --license licenses.txt",
+    "all": "npm run build && npm run format && npm run lint && npm run package && npm test"
   },
   "author": "RSaiga",
   "license": "MIT",
