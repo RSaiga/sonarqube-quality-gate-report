@@ -164,6 +164,7 @@ const run = async () => {
     await slack(`${mention}\n${message}`);
 };
 exports.run = run;
+(0, exports.run)();
 
 
 /***/ }),

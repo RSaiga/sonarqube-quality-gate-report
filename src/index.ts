@@ -144,5 +144,6 @@ export const run = async () => {
   message += `severity: \n${severity}\n`
 
   await slack(`${mention}\n${message}`);
-
 };
+
+run()
