@@ -40,18 +40,20 @@ const axios_1 = __importDefault(__nccwpck_require__(8757));
 const run = async () => {
     const sonar = core.getInput('sonar');
     const projectKey = core.getInput('projectKey');
-    const username = core.getInput('username');
-    const password = core.getInput('password');
+    const token = core.getInput('token');
+    // const username = core.getInput('username');
+    // const password = core.getInput('password');
     const onNewCode = core.getInput('onNewCode');
     const webhookUrl = core.getInput('webhook');
     const mention = core.getInput('mention');
-    core.debug(sonar);
-    core.debug(projectKey);
-    core.debug(username);
-    core.debug(password);
-    core.debug(onNewCode);
-    core.debug(webhookUrl);
-    core.debug(mention);
+    core.info(sonar);
+    core.info(projectKey);
+    core.info(token);
+    // core.debug(username);
+    // core.debug(password);
+    core.info(onNewCode);
+    core.info(webhookUrl);
+    core.info(mention);
     const getCognitiveComplexity = async () => {
         // const response = await fetch(
         //   // 'http://localhost:8084/api/measures/component?component=kings_python&metricKeys=cognitive_complexity',
@@ -68,7 +70,7 @@ const run = async () => {
         `${sonar}/api/measures/component?component=${projectKey}&metricKeys=cognitive_complexity`, {
             headers: {
                 // 'Authorization': 'Basic ' + new Buffer('admin' + ':' + '19820101').toString('base64')
-                'Authorization': 'Basic ' + new Buffer(`${username}:${password}`).toString('base64')
+                'Authorization': `Bearer ${token}`
             }
         });
         return response.data.component.measures[0].value;
@@ -89,7 +91,8 @@ const run = async () => {
         `${sonar}/api/measures/component?component=${projectKey}&metricKeys=coverage`, {
             headers: {
                 // 'Authorization': 'Basic ' + new Buffer('admin' + ':' + '19820101').toString('base64')
-                'Authorization': 'Basic ' + new Buffer(`${username}:${password}`).toString('base64')
+                // 'Authorization': 'Basic ' + new Buffer(`${username}:${password}`).toString('base64')
+                'Authorization': `Bearer ${token}`
             }
         });
         return response.data.component.measures[0].value;
@@ -110,7 +113,8 @@ const run = async () => {
         `${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_coverage`, {
             headers: {
                 // 'Authorization': 'Basic ' + new Buffer('admin' + ':' + '19820101').toString('base64')
-                'Authorization': 'Basic ' + new Buffer(`${username}:${password}`).toString('base64')
+                // 'Authorization': 'Basic ' + new Buffer(`${username}:${password}`).toString('base64')
+                'Authorization': `Bearer ${token}`
             }
         });
         return response.data.component.measures[0].period.value;
@@ -131,7 +135,8 @@ const run = async () => {
         `${sonar}/api/measures/component?component=${projectKey}&metricKeys=code_smells`, {
             headers: {
                 // 'Authorization': 'Basic ' + new Buffer('admin' + ':' + '19820101').toString('base64')
-                'Authorization': 'Basic ' + new Buffer(`${username}:${password}`).toString('base64')
+                // 'Authorization': 'Basic ' + new Buffer(`${username}:${password}`).toString('base64')
+                'Authorization': `Bearer ${token}`
             }
         });
         return response.data.component.measures[0].value;
@@ -152,7 +157,8 @@ const run = async () => {
         `${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_code_smells`, {
             headers: {
                 // 'Authorization': 'Basic ' + new Buffer('admin' + ':' + '19820101').toString('base64')
-                'Authorization': 'Basic ' + new Buffer(`${username}:${password}`).toString('base64')
+                // 'Authorization': 'Basic ' + new Buffer(`${username}:${password}`).toString('base64')
+                'Authorization': `Bearer ${token}`
             }
         });
         return response.data.component.measures[0].period.value;
@@ -173,7 +179,8 @@ const run = async () => {
         `${sonar}/api/issues/search?componentKeys=${projectKey}&facets=severities&resolved=false&ps=1`, {
             headers: {
                 // 'Authorization': 'Basic ' + new Buffer('admin' + ':' + '19820101').toString('base64')
-                'Authorization': 'Basic ' + new Buffer(`${username}:${password}`).toString('base64')
+                // 'Authorization': 'Basic ' + new Buffer(`${username}:${password}`).toString('base64')
+                'Authorization': `Bearer ${token}`
             }
         });
         const values = response.data.facets[0].values;
@@ -192,31 +199,31 @@ const run = async () => {
     let message = '';
     const cognitiveComplexity = await getCognitiveComplexity();
     console.log(cognitiveComplexity);
-    core.debug(cognitiveComplexity);
+    core.info(cognitiveComplexity);
     message += `cognitive_complexity: ${cognitiveComplexity}\n`;
     if (onNewCode === 'off') {
         const coverage = await getCoverage();
         console.log(coverage);
-        core.debug(coverage);
+        core.info(coverage);
         message += `coverage: ${coverage}\n`;
         const codeSmells = await getCodeSmells();
         console.log(codeSmells);
-        core.debug(codeSmells);
+        core.info(codeSmells);
         message += `code_smells: ${codeSmells}\n`;
     }
     else {
         const coverage4NewCode = await getCoverage4NewCode();
         console.log(coverage4NewCode);
-        core.debug(coverage4NewCode);
+        core.info(coverage4NewCode);
         message += `coverage_new_code: ${coverage4NewCode}\n`;
         const codeSmells4NewCode = await getCodeSmells4NewCode();
         console.log(codeSmells4NewCode);
-        core.debug(codeSmells4NewCode);
+        core.info(codeSmells4NewCode);
         message += `code_smells_new_code: ${coverage4NewCode}\n`;
     }
     const severity = await getSeverity();
     console.log(severity);
-    core.debug(severity);
+    core.info(severity);
     message += `severity: \n${severity}\n`;
     await slack(`${mention}\n${message}`);
 };
