@@ -22,4 +22,4 @@ jobs:
           password: '19820101'
           onNewCode: 'off'
           webhook: 'https://hooks.slack.com/services/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'
-          mention: ''@r.saiga'
+          mention: '@r.saiga'
