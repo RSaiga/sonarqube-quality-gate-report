@@ -1,0 +1,32 @@
+name: 'sonarqube-quality-gate-report'
+description: 'Retrieve quality indicators from sonarqube and notify slack.'
+author: 'RSaiga'
+branding:
+  icon: 'check'
+  color: 'gray-dark'
+inputs:
+  sonar:
+    required: true
+    description: 'sonarqube url'
+  projectKey:
+    required: true
+    description: 'sonarqube project key name'
+  user:
+    required: true
+    description: 'sonarqube username'
+  password:
+    required: true
+    description: 'sonarqube password'
+  onNewCode:
+    required: false
+    description: 'Get a quality indicator for the new code'
+    default: 'off'
+  webhook:
+    required: true
+    description: 'webhook url for slack'
+  mention:
+    required: false
+    description: 'slack mention'
+runs:
+  using: 'node16'
+  main: 'dist/index.js'

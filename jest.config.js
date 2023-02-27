@@ -1,0 +1,14 @@
+/** @type {import('ts-jest').JestConfigWithTsJest} */
+module.exports = {
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  roots: ["<rootDir>/tests", "<rootDir>/src"],
+  testRegex: '.*\\.test\\.ts$',
+  collectCoverage: true,
+  collectCoverageFrom: [
+    "**/*.ts",
+    "!**/node_modules/**",
+  ],
+  coverageDirectory: 'coverage_dir',
+  coverageReporters: ["html"]
+};
