@@ -1,4 +1,4 @@
-name: 'sonarqube-quality-gate-report'
+name: 'sonarqube-quality-gate-report-to-slack'
 description: 'Retrieve quality indicators from sonarqube and notify slack.'
 author: 'RSaiga'
 branding:
