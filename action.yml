@@ -14,12 +14,6 @@ inputs:
   token:
     required: true
     description: 'sonarqube token'
-#  user:
-#    required: true
-#    description: 'sonarqube username'
-#  password:
-#    required: true
-#    description: 'sonarqube password'
   onNewCode:
     required: false
     description: 'Get a quality indicator for the new code'
@@ -27,8 +21,8 @@ inputs:
   webhook:
     required: true
     description: 'webhook url for slack'
-  mention:
-    required: false
+  memberId:
+    required: true
     description: 'slack mention'
 runs:
   using: 'node16'
