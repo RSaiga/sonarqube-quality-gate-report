@@ -1,5 +1,6 @@
 import {IncomingWebhook} from "@slack/webhook";
 import * as core from '@actions/core';
+import axios from "axios";
 
 export const run = async () => {
   const sonar = core.getInput('sonar');
@@ -17,7 +18,17 @@ export const run = async () => {
   core.debug(webhookUrl);
   core.debug(mention);
   const getCognitiveComplexity = async () => {
-    const response = await fetch(
+    // const response = await fetch(
+    //   // 'http://localhost:8084/api/measures/component?component=kings_python&metricKeys=cognitive_complexity',
+    //   `${sonar}/api/measures/component?component=${projectKey}&metricKeys=cognitive_complexity`,
+    //   {
+    //     headers: {
+    //       // 'Authorization': 'Basic ' + new Buffer('admin' + ':' + '19820101').toString('base64')
+    //       'Authorization': 'Basic ' + new Buffer(`${username}:${password}`).toString('base64')
+    //     }
+    //   });
+    // const res = await response.json();
+    const response = await axios.get(
       // 'http://localhost:8084/api/measures/component?component=kings_python&metricKeys=cognitive_complexity',
       `${sonar}/api/measures/component?component=${projectKey}&metricKeys=cognitive_complexity`,
       {
@@ -26,11 +37,20 @@ export const run = async () => {
           'Authorization': 'Basic ' + new Buffer(`${username}:${password}`).toString('base64')
         }
       });
-    const res = await response.json();
-    return res.component.measures[0].value;
+    return response.data.component.measures[0].value;
   };
   const getCoverage = async () => {
-    const response = await fetch(
+    // const response = await fetch(
+    //   // 'http://localhost:8084/api/measures/component?component=kings_python&metricKeys=coverage',
+    //   `${sonar}/api/measures/component?component=${projectKey}&metricKeys=coverage`,
+    //   {
+    //     headers: {
+    //       // 'Authorization': 'Basic ' + new Buffer('admin' + ':' + '19820101').toString('base64')
+    //       'Authorization': 'Basic ' + new Buffer(`${username}:${password}`).toString('base64')
+    //     }
+    //   });
+    // const res = await response.json();
+    const response = await axios.get(
       // 'http://localhost:8084/api/measures/component?component=kings_python&metricKeys=coverage',
       `${sonar}/api/measures/component?component=${projectKey}&metricKeys=coverage`,
       {
@@ -39,11 +59,20 @@ export const run = async () => {
           'Authorization': 'Basic ' + new Buffer(`${username}:${password}`).toString('base64')
         }
       });
-    const res = await response.json();
-    return res.component.measures[0].value;
+    return response.data.component.measures[0].value;
   };
   const getCoverage4NewCode = async () => {
-    const response = await fetch(
+    // const response = await fetch(
+    //   // 'http://localhost:8084/api/measures/component?component=kings_python&metricKeys=new_coverage',
+    //   `${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_coverage`,
+    //   {
+    //     headers: {
+    //       // 'Authorization': 'Basic ' + new Buffer('admin' + ':' + '19820101').toString('base64')
+    //       'Authorization': 'Basic ' + new Buffer(`${username}:${password}`).toString('base64')
+    //     }
+    //   });
+    // const res = await response.json();
+    const response = await axios.get(
       // 'http://localhost:8084/api/measures/component?component=kings_python&metricKeys=new_coverage',
       `${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_coverage`,
       {
@@ -52,12 +81,20 @@ export const run = async () => {
           'Authorization': 'Basic ' + new Buffer(`${username}:${password}`).toString('base64')
         }
       });
-    const res = await response.json();
-    console.log(res.component.measures[0])
-    return res.component.measures[0].period.value;
+    return response.data.component.measures[0].period.value;
   };
   const getCodeSmells = async () => {
-    const response = await fetch(
+    // const response = await fetch(
+    //   // 'http://localhost:8084/api/measures/component?component=kings_python&metricKeys=code_smells',
+    //   `${sonar}/api/measures/component?component=${projectKey}&metricKeys=code_smells`,
+    //   {
+    //     headers: {
+    //       // 'Authorization': 'Basic ' + new Buffer('admin' + ':' + '19820101').toString('base64')
+    //       'Authorization': 'Basic ' + new Buffer(`${username}:${password}`).toString('base64')
+    //     }
+    //   });
+    // const res = await response.json();
+    const response = await axios.get(
       // 'http://localhost:8084/api/measures/component?component=kings_python&metricKeys=code_smells',
       `${sonar}/api/measures/component?component=${projectKey}&metricKeys=code_smells`,
       {
@@ -66,11 +103,20 @@ export const run = async () => {
           'Authorization': 'Basic ' + new Buffer(`${username}:${password}`).toString('base64')
         }
       });
-    const res = await response.json();
-    return res.component.measures[0].value;
+    return response.data.component.measures[0].value;
   };
   const getCodeSmells4NewCode = async () => {
-    const response = await fetch(
+    // const response = await fetch(
+    //   // 'http://localhost:8084/api/measures/component?component=kings_python&metricKeys=new_code_smells',
+    //   `${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_code_smells`,
+    //   {
+    //     headers: {
+    //       // 'Authorization': 'Basic ' + new Buffer('admin' + ':' + '19820101').toString('base64')
+    //       'Authorization': 'Basic ' + new Buffer(`${username}:${password}`).toString('base64')
+    //     }
+    //   });
+    // const res = await response.json();
+    const response = await axios.get(
       // 'http://localhost:8084/api/measures/component?component=kings_python&metricKeys=new_code_smells',
       `${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_code_smells`,
       {
@@ -79,11 +125,20 @@ export const run = async () => {
           'Authorization': 'Basic ' + new Buffer(`${username}:${password}`).toString('base64')
         }
       });
-    const res = await response.json();
-    return res.component.measures[0].period.value;
+    return response.data.component.measures[0].period.value;
   };
   const getSeverity = async () => {
-    const response = await fetch(
+    // const response = await fetch(
+    //   // 'http://localhost:8084/api/issues/search?componentKeys=kings_python&facets=severities&resolved=false&ps=1',
+    //   `${sonar}/api/issues/search?componentKeys=${projectKey}&facets=severities&resolved=false&ps=1`,
+    //   {
+    //     headers: {
+    //       // 'Authorization': 'Basic ' + new Buffer('admin' + ':' + '19820101').toString('base64')
+    //       'Authorization': 'Basic ' + new Buffer(`${username}:${password}`).toString('base64')
+    //     }
+    //   });
+    // const res = await response.json();
+    const response = await axios.get(
       // 'http://localhost:8084/api/issues/search?componentKeys=kings_python&facets=severities&resolved=false&ps=1',
       `${sonar}/api/issues/search?componentKeys=${projectKey}&facets=severities&resolved=false&ps=1`,
       {
@@ -92,8 +147,7 @@ export const run = async () => {
           'Authorization': 'Basic ' + new Buffer(`${username}:${password}`).toString('base64')
         }
       });
-    const res = await response.json();
-    const values = res.facets[0].values;
+    const values = response.data.facets[0].values;
     let message = ''
     for (const value of values) {
       message += `${value.val}: ${value.count}\n`
