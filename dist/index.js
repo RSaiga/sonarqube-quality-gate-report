@@ -37,6 +37,7 @@ exports.run = void 0;
 const webhook_1 = __nccwpck_require__(1095);
 const core = __importStar(__nccwpck_require__(2186));
 const axios_1 = __importDefault(__nccwpck_require__(8757));
+__nccwpck_require__(4227);
 const run = async () => {
     const sonar = core.getInput('sonar');
     const projectKey = core.getInput('projectKey');
@@ -44,10 +45,17 @@ const run = async () => {
     const onNewCode = core.getInput('onNewCode');
     const webhookUrl = core.getInput('webhook');
     const memberId = core.getInput('memberId');
+    // const sonar = process.env.SONAR
+    // const projectKey = process.env.PROJECT_KEY
+    // const token = process.env.TOKEN
+    // const onNewCode = process.env.ON_NEW_CODE
+    // const webhookUrl = process.env.WEBHOOK ?? ''
+    // const memberId = process.env.MEMBER_ID
     const getCognitiveComplexity = async () => {
         const response = await axios_1.default.get(`${sonar}/api/measures/component?component=${projectKey}&metricKeys=cognitive_complexity`, {
             headers: {
                 'Authorization': `Bearer ${token}`
+                // 'Authorization': 'Basic ' + new Buffer('admin' + ':' + '19820101').toString('base64')
             }
         });
         return response.data.component.measures[0].value;
@@ -56,6 +64,7 @@ const run = async () => {
         const response = await axios_1.default.get(`${sonar}/api/measures/component?component=${projectKey}&metricKeys=coverage`, {
             headers: {
                 'Authorization': `Bearer ${token}`
+                // 'Authorization': 'Basic ' + new Buffer('admin' + ':' + '19820101').toString('base64')
             }
         });
         return response.data.component.measures[0].value;
@@ -64,6 +73,7 @@ const run = async () => {
         const response = await axios_1.default.get(`${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_coverage`, {
             headers: {
                 'Authorization': `Bearer ${token}`
+                // 'Authorization': 'Basic ' + new Buffer('admin' + ':' + '19820101').toString('base64')
             }
         });
         return response.data.component.measures[0].period.value;
@@ -72,6 +82,7 @@ const run = async () => {
         const response = await axios_1.default.get(`${sonar}/api/measures/component?component=${projectKey}&metricKeys=code_smells`, {
             headers: {
                 'Authorization': `Bearer ${token}`
+                // 'Authorization': 'Basic ' + new Buffer('admin' + ':' + '19820101').toString('base64')
             }
         });
         return response.data.component.measures[0].value;
@@ -80,6 +91,7 @@ const run = async () => {
         const response = await axios_1.default.get(`${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_code_smells`, {
             headers: {
                 'Authorization': `Bearer ${token}`
+                // 'Authorization': 'Basic ' + new Buffer('admin' + ':' + '19820101').toString('base64')
             }
         });
         return response.data.component.measures[0].period.value;
@@ -88,37 +100,92 @@ const run = async () => {
         const response = await axios_1.default.get(`${sonar}/api/issues/search?componentKeys=${projectKey}&facets=severities&resolved=false&s=SEVERITY&ps=1`, {
             headers: {
                 'Authorization': `Bearer ${token}`
+                // 'Authorization': 'Basic ' + new Buffer('admin' + ':' + '19820101').toString('base64')
             }
         });
-        const values = response.data.facets[0].values;
-        let message = '';
-        for (const value of values) {
-            message += `${value.val}: ${value.count}\n`;
-        }
-        return message;
+        return response.data.facets[0].values;
     };
-    const slack = async (text) => {
+    const slack = async (template) => {
         const webhook = new webhook_1.IncomingWebhook(webhookUrl);
-        await webhook.send({ text });
+        await webhook.send({ attachments: template });
     };
-    let message = '';
     const severity = await getSeverity();
-    message += `Severity: \n${severity}\n`;
-    const cognitiveComplexity = await getCognitiveComplexity();
-    message += `cognitive_complexity: ${cognitiveComplexity}\n`;
+    let coverage;
+    let codeSmells;
     if (onNewCode === 'off') {
-        const coverage = await getCoverage();
-        message += `coverage: ${coverage} %\n`;
-        const codeSmells = await getCodeSmells();
-        message += `code_smells: ${codeSmells}\n`;
+        coverage = await getCoverage();
+        codeSmells = await getCodeSmells();
     }
     else {
-        const coverage4NewCode = await getCoverage4NewCode();
-        message += `coverage_new_code: ${coverage4NewCode} %\n`;
-        const codeSmells4NewCode = await getCodeSmells4NewCode();
-        message += `code_smells_new_code: ${codeSmells4NewCode}\n`;
+        coverage = await getCoverage4NewCode();
+        codeSmells = await getCodeSmells4NewCode();
     }
-    await slack(`<@${memberId}>\n${message}`);
+    const cognitiveComplexity = await getCognitiveComplexity();
+    const getSeverityCount = (type) => severity.find((element) => element.val === type).count;
+    const getSeverityEmoji = (type, threshold) => getSeverityCount(type) <= threshold ? ":white_check_mark:" : ":fire:";
+    const getThresholdEmoji = (coverage, threshold) => coverage <= threshold ? ":white_check_mark:" : ":fire:";
+    const template = [
+        {
+            "color": "#35ef0a",
+            "blocks": [
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": `<@${memberId}>\n\n*Notification from sonarqube, please fix!*`
+                    }
+                },
+                {
+                    "type": "divider"
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": `*BLOCKER* : *${getSeverityCount('BLOCKER')}* ${getSeverityEmoji('BLOCKER', 0)}  *CRITICAL* : *${getSeverityCount('CRITICAL')}* ${getSeverityEmoji('CRITICAL', 0)}`
+                    }
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": `*MAJOR* : *${getSeverityCount('MAJOR')}* ${getSeverityEmoji('MAJOR', 0)}  *MINOR* : *${getSeverityCount('MINOR')}* ${getSeverityEmoji('MINOR', 0)}  *INFO* : *${getSeverityCount('INFO')}* ${getSeverityEmoji('INFO', 0)}`
+                    }
+                },
+                {
+                    "type": "divider"
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": `*Coverage* : *${coverage} %* ${getThresholdEmoji(coverage, 80)}`
+                    }
+                },
+                {
+                    "type": "divider"
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": `*Code Smells* : *${codeSmells}* ${getThresholdEmoji(codeSmells, 80)}`
+                    }
+                },
+                {
+                    "type": "divider"
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": `*Cognitive Complexity* : *${cognitiveComplexity}* ${getThresholdEmoji(cognitiveComplexity, 80)}`
+                    }
+                }
+            ]
+        }
+    ];
+    await slack(template);
 };
 exports.run = run;
 (0, exports.run)();
@@ -6011,6 +6078,186 @@ DelayedStream.prototype._checkIfMaxDataSizeExceeded = function() {
     'DelayedStream#maxDataSize of ' + this.maxDataSize + ' bytes exceeded.'
   this.emit('error', new Error(message));
 };
+
+
+/***/ }),
+
+/***/ 4227:
+/***/ ((__unused_webpack_module, __unused_webpack_exports, __nccwpck_require__) => {
+
+(function () {
+  (__nccwpck_require__(2437).config)(
+    Object.assign(
+      {},
+      __nccwpck_require__(5158),
+      __nccwpck_require__(5478)(process.argv)
+    )
+  )
+})()
+
+
+/***/ }),
+
+/***/ 5478:
+/***/ ((module) => {
+
+const re = /^dotenv_config_(encoding|path|debug|override)=(.+)$/
+
+module.exports = function optionMatcher (args) {
+  return args.reduce(function (acc, cur) {
+    const matches = cur.match(re)
+    if (matches) {
+      acc[matches[1]] = matches[2]
+    }
+    return acc
+  }, {})
+}
+
+
+/***/ }),
+
+/***/ 5158:
+/***/ ((module) => {
+
+// ../config.js accepts options via environment variables
+const options = {}
+
+if (process.env.DOTENV_CONFIG_ENCODING != null) {
+  options.encoding = process.env.DOTENV_CONFIG_ENCODING
+}
+
+if (process.env.DOTENV_CONFIG_PATH != null) {
+  options.path = process.env.DOTENV_CONFIG_PATH
+}
+
+if (process.env.DOTENV_CONFIG_DEBUG != null) {
+  options.debug = process.env.DOTENV_CONFIG_DEBUG
+}
+
+if (process.env.DOTENV_CONFIG_OVERRIDE != null) {
+  options.override = process.env.DOTENV_CONFIG_OVERRIDE
+}
+
+module.exports = options
+
+
+/***/ }),
+
+/***/ 2437:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const fs = __nccwpck_require__(7147)
+const path = __nccwpck_require__(1017)
+const os = __nccwpck_require__(2037)
+const packageJson = __nccwpck_require__(9968)
+
+const version = packageJson.version
+
+const LINE = /(?:^|^)\s*(?:export\s+)?([\w.-]+)(?:\s*=\s*?|:\s+?)(\s*'(?:\\'|[^'])*'|\s*"(?:\\"|[^"])*"|\s*`(?:\\`|[^`])*`|[^#\r\n]+)?\s*(?:#.*)?(?:$|$)/mg
+
+// Parser src into an Object
+function parse (src) {
+  const obj = {}
+
+  // Convert buffer to string
+  let lines = src.toString()
+
+  // Convert line breaks to same format
+  lines = lines.replace(/\r\n?/mg, '\n')
+
+  let match
+  while ((match = LINE.exec(lines)) != null) {
+    const key = match[1]
+
+    // Default undefined or null to empty string
+    let value = (match[2] || '')
+
+    // Remove whitespace
+    value = value.trim()
+
+    // Check if double quoted
+    const maybeQuote = value[0]
+
+    // Remove surrounding quotes
+    value = value.replace(/^(['"`])([\s\S]*)\1$/mg, '$2')
+
+    // Expand newlines if double quoted
+    if (maybeQuote === '"') {
+      value = value.replace(/\\n/g, '\n')
+      value = value.replace(/\\r/g, '\r')
+    }
+
+    // Add to object
+    obj[key] = value
+  }
+
+  return obj
+}
+
+function _log (message) {
+  console.log(`[dotenv@${version}][DEBUG] ${message}`)
+}
+
+function _resolveHome (envPath) {
+  return envPath[0] === '~' ? path.join(os.homedir(), envPath.slice(1)) : envPath
+}
+
+// Populates process.env from .env file
+function config (options) {
+  let dotenvPath = path.resolve(process.cwd(), '.env')
+  let encoding = 'utf8'
+  const debug = Boolean(options && options.debug)
+  const override = Boolean(options && options.override)
+
+  if (options) {
+    if (options.path != null) {
+      dotenvPath = _resolveHome(options.path)
+    }
+    if (options.encoding != null) {
+      encoding = options.encoding
+    }
+  }
+
+  try {
+    // Specifying an encoding returns a string instead of a buffer
+    const parsed = DotenvModule.parse(fs.readFileSync(dotenvPath, { encoding }))
+
+    Object.keys(parsed).forEach(function (key) {
+      if (!Object.prototype.hasOwnProperty.call(process.env, key)) {
+        process.env[key] = parsed[key]
+      } else {
+        if (override === true) {
+          process.env[key] = parsed[key]
+        }
+
+        if (debug) {
+          if (override === true) {
+            _log(`"${key}" is already defined in \`process.env\` and WAS overwritten`)
+          } else {
+            _log(`"${key}" is already defined in \`process.env\` and was NOT overwritten`)
+          }
+        }
+      }
+    })
+
+    return { parsed }
+  } catch (e) {
+    if (debug) {
+      _log(`Failed to load ${dotenvPath} ${e.message}`)
+    }
+
+    return { error: e }
+  }
+}
+
+const DotenvModule = {
+  config,
+  parse
+}
+
+module.exports.config = DotenvModule.config
+module.exports.parse = DotenvModule.parse
+module.exports = DotenvModule
 
 
 /***/ }),
@@ -13106,6 +13353,14 @@ module.exports = JSON.parse('{"name":"axios","version":"0.21.4","description":"P
 
 "use strict";
 module.exports = JSON.parse('{"name":"@slack/webhook","version":"6.1.0","description":"Official library for using the Slack Platform\'s Incoming Webhooks","author":"Slack Technologies, LLC","license":"MIT","keywords":["slack","request","client","http","api","proxy"],"main":"dist/index.js","types":"./dist/index.d.ts","files":["dist/**/*"],"engines":{"node":">= 12.13.0","npm":">= 6.12.0"},"repository":"slackapi/node-slack-sdk","homepage":"https://slack.dev/node-slack-sdk/webhook","publishConfig":{"access":"public"},"bugs":{"url":"https://github.com/slackapi/node-slack-sdk/issues"},"scripts":{"prepare":"npm run build","build":"npm run build:clean && tsc","build:clean":"shx rm -rf ./dist ./coverage ./.nyc_output","lint":"eslint --ext .ts src","test":"npm run lint && npm run build && nyc mocha --config .mocharc.json src/*.spec.js","coverage":"codecov -F webhook --root=$PWD","ref-docs:model":"api-extractor run"},"dependencies":{"@slack/types":"^1.2.1","@types/node":">=12.0.0","axios":"^0.21.4"},"devDependencies":{"@microsoft/api-extractor":"^7.3.4","@typescript-eslint/eslint-plugin":"^4.4.1","@typescript-eslint/parser":"^4.4.0","@types/chai":"^4.1.7","@types/mocha":"^5.2.6","chai":"^4.2.0","codecov":"^3.2.0","eslint":"^7.32.0","eslint-config-airbnb-base":"^14.2.1","eslint-config-airbnb-typescript":"^12.3.1","eslint-plugin-import":"^2.22.1","eslint-plugin-jsdoc":"^30.6.1","eslint-plugin-node":"^11.1.0","mocha":"^9.1.0","nock":"^13.0.0","nyc":"^14.1.1","shx":"^0.3.2","sinon":"^7.2.7","source-map-support":"^0.5.10","ts-node":"^8.0.3","typescript":"^4.1.0"}}');
+
+/***/ }),
+
+/***/ 9968:
+/***/ ((module) => {
+
+"use strict";
+module.exports = JSON.parse('{"name":"dotenv","version":"16.0.3","description":"Loads environment variables from .env file","main":"lib/main.js","types":"lib/main.d.ts","exports":{".":{"require":"./lib/main.js","types":"./lib/main.d.ts","default":"./lib/main.js"},"./config":"./config.js","./config.js":"./config.js","./lib/env-options":"./lib/env-options.js","./lib/env-options.js":"./lib/env-options.js","./lib/cli-options":"./lib/cli-options.js","./lib/cli-options.js":"./lib/cli-options.js","./package.json":"./package.json"},"scripts":{"dts-check":"tsc --project tests/types/tsconfig.json","lint":"standard","lint-readme":"standard-markdown","pretest":"npm run lint && npm run dts-check","test":"tap tests/*.js --100 -Rspec","prerelease":"npm test","release":"standard-version"},"repository":{"type":"git","url":"git://github.com/motdotla/dotenv.git"},"keywords":["dotenv","env",".env","environment","variables","config","settings"],"readmeFilename":"README.md","license":"BSD-2-Clause","devDependencies":{"@types/node":"^17.0.9","decache":"^4.6.1","dtslint":"^3.7.0","sinon":"^12.0.1","standard":"^16.0.4","standard-markdown":"^7.1.0","standard-version":"^9.3.2","tap":"^15.1.6","tar":"^6.1.11","typescript":"^4.5.4"},"engines":{"node":">=12"}}');
 
 /***/ }),
 
