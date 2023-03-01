@@ -107,3 +107,5 @@ lib
 
 # TernJS port file
 .tern-port
+
+coverage_dir/
