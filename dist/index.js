@@ -107,7 +107,7 @@ const run = async () => {
     };
     const slack = async (template) => {
         const webhook = new webhook_1.IncomingWebhook(webhookUrl);
-        await webhook.send({ attachments: template });
+        await webhook.send(template);
     };
     const severity = await getSeverity();
     let coverage;
@@ -123,68 +123,62 @@ const run = async () => {
     const cognitiveComplexity = await getCognitiveComplexity();
     const getSeverityCount = (type) => severity.find((element) => element.val === type).count;
     const getSeverityEmoji = (type, threshold) => getSeverityCount(type) <= threshold ? ":white_check_mark:" : ":fire:";
-    const getThresholdEmoji = (coverage, threshold) => coverage <= threshold ? ":white_check_mark:" : ":fire:";
-    const template = [
-        {
-            "color": "#35ef0a",
-            "blocks": [
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": `<@${memberId}>\n\n*Notification from sonarqube, please fix!*`
+    const getThresholdEmoji = (coverage, threshold) => coverage >= threshold ? ":white_check_mark:" : ":fire:";
+    const mention = (memberId !== "") ? `<@${memberId}>\n\n` : ``;
+    const template = {
+        "text": `${mention}*Notification from sonarqube, please fix!*\n${sonar}/dashboard?id=${projectKey}`,
+        "attachments": [
+            {
+                "color": "#35ef0a",
+                "blocks": [
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": `*BLOCKER* : *${getSeverityCount('BLOCKER')}* ${getSeverityEmoji('BLOCKER', 0)}  *CRITICAL* : *${getSeverityCount('CRITICAL')}* ${getSeverityEmoji('CRITICAL', 0)}`
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": `*MAJOR* : *${getSeverityCount('MAJOR')}* ${getSeverityEmoji('MAJOR', 0)}  *MINOR* : *${getSeverityCount('MINOR')}* ${getSeverityEmoji('MINOR', 0)}  *INFO* : *${getSeverityCount('INFO')}* ${getSeverityEmoji('INFO', 0)}`
+                        }
+                    },
+                    {
+                        "type": "divider"
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": `*Coverage* : *${coverage} %* ${getThresholdEmoji(coverage, 80)}`
+                        }
+                    },
+                    {
+                        "type": "divider"
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": `*Code Smells* : *${codeSmells}* ${getThresholdEmoji(codeSmells, 80)}`
+                        }
+                    },
+                    {
+                        "type": "divider"
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": `*Cognitive Complexity* : *${cognitiveComplexity}* ${getThresholdEmoji(cognitiveComplexity, 80)}`
+                        }
                     }
-                },
-                {
-                    "type": "divider"
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": `*BLOCKER* : *${getSeverityCount('BLOCKER')}* ${getSeverityEmoji('BLOCKER', 0)}  *CRITICAL* : *${getSeverityCount('CRITICAL')}* ${getSeverityEmoji('CRITICAL', 0)}`
-                    }
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": `*MAJOR* : *${getSeverityCount('MAJOR')}* ${getSeverityEmoji('MAJOR', 0)}  *MINOR* : *${getSeverityCount('MINOR')}* ${getSeverityEmoji('MINOR', 0)}  *INFO* : *${getSeverityCount('INFO')}* ${getSeverityEmoji('INFO', 0)}`
-                    }
-                },
-                {
-                    "type": "divider"
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": `*Coverage* : *${coverage} %* ${getThresholdEmoji(coverage, 80)}`
-                    }
-                },
-                {
-                    "type": "divider"
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": `*Code Smells* : *${codeSmells}* ${getThresholdEmoji(codeSmells, 80)}`
-                    }
-                },
-                {
-                    "type": "divider"
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": `*Cognitive Complexity* : *${cognitiveComplexity}* ${getThresholdEmoji(cognitiveComplexity, 80)}`
-                    }
-                }
-            ]
-        }
-    ];
+                ]
+            }
+        ]
+    };
     await slack(template);
 };
 exports.run = run;
