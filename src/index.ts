@@ -4,25 +4,19 @@ import axios from "axios";
 import 'dotenv/config'
 
 export const run = async () => {
-  const sonar = core.getInput('sonar')
-  const projectKey = core.getInput('projectKey');
-  const token = core.getInput('token');
-  const onNewCode = core.getInput('onNewCode');
-  const webhookUrl = core.getInput('webhook');
-  const memberId = core.getInput('memberId');
-  // const sonar = process.env.SONAR
-  // const projectKey = process.env.PROJECT_KEY
-  // const token = process.env.TOKEN
-  // const onNewCode = process.env.ON_NEW_CODE
-  // const webhookUrl = process.env.WEBHOOK ?? ''
-  // const memberId = process.env.MEMBER_ID
+  const sonar = process.env.SONAR ?? core.getInput('sonar')
+  const projectKey = process.env.PROJECT_KEY ?? core.getInput('projectKey');
+  const token = process.env.PROJECT_KEY ?? core.getInput('token');
+  const onNewCode = process.env.ON_NEW_CODE ?? core.getInput('onNewCode');
+  const webhookUrl = process.env.WEBHOOK ?? core.getInput('webhook');
+  const memberId = process.env.MEMBER_ID ?? core.getInput('memberId');
   const getCognitiveComplexity = async () => {
     const response = await axios.get(
       `${sonar}/api/measures/component?component=${projectKey}&metricKeys=cognitive_complexity`,
       {
         headers: {
           'Authorization': `Bearer ${token}`
-          // 'Authorization': 'Basic ' + new Buffer('admin' + ':' + '19820101').toString('base64')
+          // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
         }
       });
     return response.data.component.measures[0].value;
@@ -33,7 +27,7 @@ export const run = async () => {
       {
         headers: {
           'Authorization': `Bearer ${token}`
-          // 'Authorization': 'Basic ' + new Buffer('admin' + ':' + '19820101').toString('base64')
+          // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
         }
       });
     return response.data.component.measures[0].value;
@@ -44,10 +38,11 @@ export const run = async () => {
       {
         headers: {
           'Authorization': `Bearer ${token}`
-          // 'Authorization': 'Basic ' + new Buffer('admin' + ':' + '19820101').toString('base64')
+          // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
         }
       });
-    return response.data.component.measures[0].period.value;
+    console.log(response.data.component)
+    return response.data.component.measures[0]?.period.value;
   };
   const getCodeSmells = async () => {
     const response = await axios.get(
@@ -55,7 +50,7 @@ export const run = async () => {
       {
         headers: {
           'Authorization': `Bearer ${token}`
-          // 'Authorization': 'Basic ' + new Buffer('admin' + ':' + '19820101').toString('base64')
+          // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
         }
       });
     return response.data.component.measures[0].value;
@@ -66,10 +61,10 @@ export const run = async () => {
       {
         headers: {
           'Authorization': `Bearer ${token}`
-          // 'Authorization': 'Basic ' + new Buffer('admin' + ':' + '19820101').toString('base64')
+          // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
         }
       });
-    return response.data.component.measures[0].period.value;
+    return response.data.component.measures[0]?.period.value;
   };
   const getSeverity = async () => {
     const response = await axios.get(
@@ -77,7 +72,7 @@ export const run = async () => {
       {
         headers: {
           'Authorization': `Bearer ${token}`
-          // 'Authorization': 'Basic ' + new Buffer('admin' + ':' + '19820101').toString('base64')
+          // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
         }
       });
     return response.data.facets[0].values;
@@ -102,7 +97,8 @@ export const run = async () => {
 
   const getSeverityCount = (type: string) => severity.find((element: any) => element.val === type).count;
   const getSeverityEmoji = (type: string, threshold: number) => getSeverityCount(type) <= threshold ? ":white_check_mark:" : ":fire:";
-  const getThresholdEmoji = (coverage: number, threshold: number) => coverage >= threshold ? ":white_check_mark:" : ":fire:";
+  const getGreaterThanThresholdEmoji = (coverage: number, threshold: number) => coverage >= threshold ? ":white_check_mark:" : ":fire:";
+  const getLessThanThresholdEmoji = (coverage: number, threshold: number) => coverage <= threshold ? ":white_check_mark:" : ":fire:";
 
   const mention = (memberId !== "") ? `<@${memberId}>\n\n` : ``;
   const template = {
@@ -132,7 +128,7 @@ export const run = async () => {
             "type": "section",
             "text": {
               "type": "mrkdwn",
-              "text": `*Coverage* : *${coverage} %* ${getThresholdEmoji(coverage, 80)}`
+              "text": `*Coverage* : *${coverage} %* ${getGreaterThanThresholdEmoji(coverage, 80)}`
             }
           },
           {
@@ -142,7 +138,7 @@ export const run = async () => {
             "type": "section",
             "text": {
               "type": "mrkdwn",
-              "text": `*Code Smells* : *${codeSmells}* ${getThresholdEmoji(codeSmells, 80)}`
+              "text": `*Code Smells* : *${codeSmells}* ${getLessThanThresholdEmoji(codeSmells, 10)}`
             }
           },
           {
@@ -152,7 +148,7 @@ export const run = async () => {
             "type": "section",
             "text": {
               "type": "mrkdwn",
-              "text": `*Cognitive Complexity* : *${cognitiveComplexity}* ${getThresholdEmoji(cognitiveComplexity, 80)}`
+              "text": `*Cognitive Complexity* : *${cognitiveComplexity}* ${getLessThanThresholdEmoji(cognitiveComplexity, 30)}`
             }
           }
         ]
