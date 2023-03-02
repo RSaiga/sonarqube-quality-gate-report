@@ -53,7 +53,6 @@ const run = async () => {
             }
         });
         console.log(response);
-        core.info(JSON.stringify(response));
         return response.data.component.measures[0].value;
     };
     const getCoverage = async () => {
@@ -64,7 +63,6 @@ const run = async () => {
             }
         });
         console.log(response);
-        core.info(JSON.stringify(response));
         return response.data.component.measures[0].value;
     };
     const getCoverage4NewCode = async () => {
