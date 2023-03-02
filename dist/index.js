@@ -178,6 +178,7 @@ const run = async () => {
     await slack(template);
 };
 exports.run = run;
+(0, exports.run)();
 
 
 /***/ }),
