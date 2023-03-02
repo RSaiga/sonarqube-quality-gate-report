@@ -75,7 +75,6 @@ const run = async () => {
             }
         });
         console.log(response);
-        core.info(JSON.stringify(response));
         return response.data.component.measures[0]?.period.value;
     };
     const getCodeSmells = async () => {
@@ -86,7 +85,6 @@ const run = async () => {
             }
         });
         console.log(response);
-        core.info(JSON.stringify(response));
         return response.data.component.measures[0].value;
     };
     const getCodeSmells4NewCode = async () => {
@@ -97,7 +95,6 @@ const run = async () => {
             }
         });
         console.log(response);
-        core.info(JSON.stringify(response));
         return response.data.component.measures[0]?.period.value;
     };
     const getSeverity = async () => {
@@ -108,7 +105,6 @@ const run = async () => {
             }
         });
         console.log(response);
-        core.info(JSON.stringify(response));
         return response.data.facets[0].values;
     };
     const slack = async (template) => {
