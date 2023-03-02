@@ -158,5 +158,3 @@ export const run = async () => {
 
   await slack(template)
 };
-
-run()
