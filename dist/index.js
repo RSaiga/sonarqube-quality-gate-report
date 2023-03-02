@@ -51,11 +51,9 @@ const run = async () => {
                 'Authorization': `Bearer ${token}`
                 // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
             }
-        }).catch(e => {
-            console.log(e);
-            core.error(e);
-            throw e;
         });
+        console.log(response);
+        core.info(JSON.stringify(response));
         return response.data.component.measures[0].value;
     };
     const getCoverage = async () => {
@@ -64,11 +62,9 @@ const run = async () => {
                 'Authorization': `Bearer ${token}`
                 // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
             }
-        }).catch(e => {
-            console.log(e);
-            core.error(e);
-            throw e;
         });
+        console.log(response);
+        core.info(JSON.stringify(response));
         return response.data.component.measures[0].value;
     };
     const getCoverage4NewCode = async () => {
@@ -77,11 +73,9 @@ const run = async () => {
                 'Authorization': `Bearer ${token}`
                 // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
             }
-        }).catch(e => {
-            console.log(e);
-            core.error(e);
-            throw e;
         });
+        console.log(response);
+        core.info(JSON.stringify(response));
         return response.data.component.measures[0]?.period.value;
     };
     const getCodeSmells = async () => {
@@ -90,11 +84,9 @@ const run = async () => {
                 'Authorization': `Bearer ${token}`
                 // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
             }
-        }).catch(e => {
-            console.log(e);
-            core.error(e);
-            throw e;
         });
+        console.log(response);
+        core.info(JSON.stringify(response));
         return response.data.component.measures[0].value;
     };
     const getCodeSmells4NewCode = async () => {
@@ -104,6 +96,8 @@ const run = async () => {
                 // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
             }
         });
+        console.log(response);
+        core.info(JSON.stringify(response));
         return response.data.component.measures[0]?.period.value;
     };
     const getSeverity = async () => {
@@ -112,11 +106,9 @@ const run = async () => {
                 'Authorization': `Bearer ${token}`
                 // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
             }
-        }).catch(e => {
-            console.log(e);
-            core.error(e);
-            throw e;
         });
+        console.log(response);
+        core.info(JSON.stringify(response));
         return response.data.facets[0].values;
     };
     const slack = async (template) => {
