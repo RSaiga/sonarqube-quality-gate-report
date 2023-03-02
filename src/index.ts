@@ -18,7 +18,11 @@ export const run = async () => {
           'Authorization': `Bearer ${token}`
           // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
         }
-      });
+      }).catch(e => {
+      console.log(e)
+      core.error(e)
+      throw e
+    });
     return response.data.component.measures[0].value;
   };
   const getCoverage = async () => {
@@ -29,7 +33,11 @@ export const run = async () => {
           'Authorization': `Bearer ${token}`
           // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
         }
-      });
+      }).catch(e => {
+      console.log(e)
+      core.error(e)
+      throw e
+    });
     return response.data.component.measures[0].value;
   };
   const getCoverage4NewCode = async () => {
@@ -40,8 +48,11 @@ export const run = async () => {
           'Authorization': `Bearer ${token}`
           // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
         }
-      });
-    console.log(response.data.component)
+      }).catch(e => {
+      console.log(e)
+      core.error(e)
+      throw e
+    });
     return response.data.component.measures[0]?.period.value;
   };
   const getCodeSmells = async () => {
@@ -52,7 +63,11 @@ export const run = async () => {
           'Authorization': `Bearer ${token}`
           // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
         }
-      });
+      }).catch(e => {
+      console.log(e)
+      core.error(e)
+      throw e
+    });
     return response.data.component.measures[0].value;
   };
   const getCodeSmells4NewCode = async () => {
@@ -74,7 +89,11 @@ export const run = async () => {
           'Authorization': `Bearer ${token}`
           // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
         }
-      });
+      }).catch(e => {
+      console.log(e)
+      core.error(e)
+      throw e
+    })
     return response.data.facets[0].values;
   };
 
