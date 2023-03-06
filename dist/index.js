@@ -52,7 +52,6 @@ const run = async () => {
                 // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
             }
         });
-        console.log(response);
         return response.data.component.measures[0].value;
     };
     const getCoverage = async () => {
@@ -62,7 +61,6 @@ const run = async () => {
                 // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
             }
         });
-        console.log(response);
         return response.data.component.measures[0].value;
     };
     const getCoverage4NewCode = async () => {
@@ -72,7 +70,6 @@ const run = async () => {
                 // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
             }
         });
-        console.log(response);
         return response.data.component.measures[0]?.period.value;
     };
     const getCodeSmells = async () => {
@@ -82,7 +79,6 @@ const run = async () => {
                 // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
             }
         });
-        console.log(response);
         return response.data.component.measures[0].value;
     };
     const getCodeSmells4NewCode = async () => {
@@ -92,7 +88,6 @@ const run = async () => {
                 // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
             }
         });
-        console.log(response);
         return response.data.component.measures[0]?.period.value;
     };
     const getSeverity = async () => {
@@ -102,8 +97,80 @@ const run = async () => {
                 // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
             }
         });
-        console.log(response);
         return response.data.facets[0].values;
+    };
+    const getSecurityHotspots = async () => {
+        const response = await axios_1.default.get(`${sonar}/api/measures/component?component=${projectKey}&metricKeys=security_hotspots`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+                // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
+            }
+        });
+        return response.data.component.measures[0].value;
+    };
+    const getSecurityHotspots4NewCode = async () => {
+        const response = await axios_1.default.get(`${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_security_hotspots`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+                // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
+            }
+        });
+        return response.data.component.measures[0]?.period.value;
+    };
+    const getDuplicatedLinesDensity = async () => {
+        const response = await axios_1.default.get(`${sonar}/api/measures/component?component=${projectKey}&metricKeys=duplicated_lines_density`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+                // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
+            }
+        });
+        return response.data.component.measures[0].value;
+    };
+    const getDuplicatedLinesDensity4NewCode = async () => {
+        const response = await axios_1.default.get(`${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_duplicated_lines_density`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+                // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
+            }
+        });
+        return response.data.component.measures[0]?.period.value;
+    };
+    const getBugs = async () => {
+        const response = await axios_1.default.get(`${sonar}/api/measures/component?component=${projectKey}&metricKeys=bugs`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+                // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
+            }
+        });
+        return response.data.component.measures[0].value;
+    };
+    const getBugs4NewCode = async () => {
+        const response = await axios_1.default.get(`${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_bugs`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+                // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
+            }
+        });
+        console.log(response);
+        return response.data.component.measures[0]?.period.value;
+    };
+    const getVulnerabilities = async () => {
+        const response = await axios_1.default.get(`${sonar}/api/measures/component?component=${projectKey}&metricKeys=vulnerabilities`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+                // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
+            }
+        });
+        return response.data.component.measures[0].value;
+    };
+    const getVulnerabilities4NewCode = async () => {
+        const response = await axios_1.default.get(`${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_vulnerabilities`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+                // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
+            }
+        });
+        return response.data.component.measures[0]?.period.value;
     };
     const slack = async (template) => {
         const webhook = new webhook_1.IncomingWebhook(webhookUrl);
@@ -112,13 +179,25 @@ const run = async () => {
     const severity = await getSeverity();
     let coverage;
     let codeSmells;
+    let securityHotspots;
+    let duplicatedLinesDensity;
+    let bugs;
+    let vulnerabilities;
     if (onNewCode === 'off') {
         coverage = await getCoverage();
         codeSmells = await getCodeSmells();
+        securityHotspots = await getSecurityHotspots();
+        duplicatedLinesDensity = await getDuplicatedLinesDensity();
+        bugs = await getBugs();
+        vulnerabilities = await getVulnerabilities();
     }
     else {
         coverage = await getCoverage4NewCode();
         codeSmells = await getCodeSmells4NewCode();
+        securityHotspots = await getSecurityHotspots4NewCode();
+        duplicatedLinesDensity = await getDuplicatedLinesDensity4NewCode();
+        bugs = await getBugs4NewCode();
+        vulnerabilities = await getVulnerabilities4NewCode();
     }
     const cognitiveComplexity = await getCognitiveComplexity();
     const getSeverityCount = (type) => severity.find((element) => element.val === type).count;
@@ -132,6 +211,13 @@ const run = async () => {
             {
                 "color": "#35ef0a",
                 "blocks": [
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": `*Bugs* : *${bugs}*   *Vulnerabilities* : *${vulnerabilities}*`
+                        }
+                    },
                     {
                         "type": "section",
                         "text": {
@@ -153,6 +239,16 @@ const run = async () => {
                         "type": "section",
                         "text": {
                             "type": "mrkdwn",
+                            "text": `*Security Hotspots* : *${securityHotspots}* ${getLessThanThresholdEmoji(securityHotspots, 0)}`
+                        }
+                    },
+                    {
+                        "type": "divider"
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
                             "text": `*Coverage* : *${coverage} %* ${getGreaterThanThresholdEmoji(coverage, 80)}`
                         }
                     },
@@ -164,6 +260,16 @@ const run = async () => {
                         "text": {
                             "type": "mrkdwn",
                             "text": `*Code Smells* : *${codeSmells}* ${getLessThanThresholdEmoji(codeSmells, 10)}`
+                        }
+                    },
+                    {
+                        "type": "divider"
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": `*Duplicated Lines* : *${duplicatedLinesDensity} %* ${getLessThanThresholdEmoji(duplicatedLinesDensity, 3)}`
                         }
                     },
                     {

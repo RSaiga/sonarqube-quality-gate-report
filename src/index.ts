@@ -19,7 +19,6 @@ export const run = async () => {
           // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
         }
       });
-    console.log(response)
     return response.data.component.measures[0].value;
   };
   const getCoverage = async () => {
@@ -31,7 +30,6 @@ export const run = async () => {
           // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
         }
       });
-    console.log(response)
     return response.data.component.measures[0].value;
   };
   const getCoverage4NewCode = async () => {
@@ -43,7 +41,6 @@ export const run = async () => {
           // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
         }
       });
-    console.log(response)
     return response.data.component.measures[0]?.period.value;
   };
   const getCodeSmells = async () => {
@@ -55,7 +52,6 @@ export const run = async () => {
           // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
         }
       });
-    console.log(response)
     return response.data.component.measures[0].value;
   };
   const getCodeSmells4NewCode = async () => {
@@ -67,7 +63,6 @@ export const run = async () => {
           // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
         }
       });
-    console.log(response)
     return response.data.component.measures[0]?.period.value;
   };
   const getSeverity = async () => {
@@ -79,8 +74,96 @@ export const run = async () => {
           // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
         }
       });
-    console.log(response)
     return response.data.facets[0].values;
+  };
+  const getSecurityHotspots = async () => {
+    const response = await axios.get(
+      `${sonar}/api/measures/component?component=${projectKey}&metricKeys=security_hotspots`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+          // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
+        }
+      });
+    return response.data.component.measures[0].value;
+  };
+  const getSecurityHotspots4NewCode = async () => {
+    const response = await axios.get(
+      `${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_security_hotspots`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+          // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
+        }
+      });
+    return response.data.component.measures[0]?.period.value;
+  };
+  const getDuplicatedLinesDensity = async () => {
+    const response = await axios.get(
+      `${sonar}/api/measures/component?component=${projectKey}&metricKeys=duplicated_lines_density`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+          // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
+        }
+      });
+    return response.data.component.measures[0].value;
+  };
+  const getDuplicatedLinesDensity4NewCode = async () => {
+    const response = await axios.get(
+      `${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_duplicated_lines_density`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+          // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
+        }
+      });
+    return response.data.component.measures[0]?.period.value;
+  };
+  const getBugs = async () => {
+    const response = await axios.get(
+      `${sonar}/api/measures/component?component=${projectKey}&metricKeys=bugs`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+          // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
+        }
+      });
+    return response.data.component.measures[0].value;
+  };
+  const getBugs4NewCode = async () => {
+    const response = await axios.get(
+      `${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_bugs`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+          // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
+        }
+      });
+    console.log(response)
+    return response.data.component.measures[0]?.period.value;
+  };
+  const getVulnerabilities = async () => {
+    const response = await axios.get(
+      `${sonar}/api/measures/component?component=${projectKey}&metricKeys=vulnerabilities`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+          // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
+        }
+      });
+    return response.data.component.measures[0].value;
+  };
+  const getVulnerabilities4NewCode = async () => {
+    const response = await axios.get(
+      `${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_vulnerabilities`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+          // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
+        }
+      });
+    return response.data.component.measures[0]?.period.value;
   };
 
   const slack = async (template: any) => {
@@ -91,12 +174,25 @@ export const run = async () => {
   const severity = await getSeverity();
   let coverage: number
   let codeSmells: number
+  let securityHotspots: number
+  let duplicatedLinesDensity: number
+  let bugs: number;
+  let vulnerabilities: number;
   if (onNewCode === 'off') {
     coverage = await getCoverage();
     codeSmells = await getCodeSmells();
+    securityHotspots = await getSecurityHotspots();
+    duplicatedLinesDensity = await getDuplicatedLinesDensity();
+    bugs = await getBugs();
+    vulnerabilities = await getVulnerabilities();
+
   } else {
     coverage = await getCoverage4NewCode();
     codeSmells = await getCodeSmells4NewCode();
+    securityHotspots = await getSecurityHotspots4NewCode();
+    duplicatedLinesDensity = await getDuplicatedLinesDensity4NewCode();
+    bugs = await getBugs4NewCode();
+    vulnerabilities = await getVulnerabilities4NewCode();
   }
   const cognitiveComplexity = await getCognitiveComplexity()
 
@@ -112,6 +208,13 @@ export const run = async () => {
       {
         "color": "#35ef0a",
         "blocks": [
+          {
+            "type": "section",
+            "text": {
+              "type": "mrkdwn",
+              "text": `*Bugs* : *${bugs}*   *Vulnerabilities* : *${vulnerabilities}*`
+            }
+          },
           {
             "type": "section",
             "text": {
@@ -133,6 +236,16 @@ export const run = async () => {
             "type": "section",
             "text": {
               "type": "mrkdwn",
+              "text": `*Security Hotspots* : *${securityHotspots}* ${getLessThanThresholdEmoji(securityHotspots, 0)}`
+            }
+          },
+          {
+            "type": "divider"
+          },
+          {
+            "type": "section",
+            "text": {
+              "type": "mrkdwn",
               "text": `*Coverage* : *${coverage} %* ${getGreaterThanThresholdEmoji(coverage, 80)}`
             }
           },
@@ -144,6 +257,16 @@ export const run = async () => {
             "text": {
               "type": "mrkdwn",
               "text": `*Code Smells* : *${codeSmells}* ${getLessThanThresholdEmoji(codeSmells, 10)}`
+            }
+          },
+          {
+            "type": "divider"
+          },
+          {
+            "type": "section",
+            "text": {
+              "type": "mrkdwn",
+              "text": `*Duplicated Lines* : *${duplicatedLinesDensity} %* ${getLessThanThresholdEmoji(duplicatedLinesDensity, 3)}`
             }
           },
           {
