@@ -10,160 +10,93 @@ export const run = async () => {
   const onNewCode = process.env.ON_NEW_CODE ?? core.getInput('onNewCode');
   const webhookUrl = process.env.WEBHOOK ?? core.getInput('webhook');
   const memberId = process.env.MEMBER_ID ?? core.getInput('memberId');
-  const getCognitiveComplexity = async () => {
-    const response = await axios.get(
-      `${sonar}/api/measures/component?component=${projectKey}&metricKeys=cognitive_complexity`,
+
+  async function fetch(url: string) {
+    return await axios.get(
+      url,
       {
         headers: {
           'Authorization': `Bearer ${token}`
           // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
         }
       });
+  }
+
+  const getCognitiveComplexity = async () => {
+    const url = `${sonar}/api/measures/component?component=${projectKey}&metricKeys=cognitive_complexity`;
+    const response = await fetch(url);
     return response.data.component.measures[0].value;
   };
   const getCoverage = async () => {
-    const response = await axios.get(
-      `${sonar}/api/measures/component?component=${projectKey}&metricKeys=coverage`,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`
-          // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
-        }
-      });
+    const url = `${sonar}/api/measures/component?component=${projectKey}&metricKeys=coverage`;
+    const response = await fetch(url);
     return response.data.component.measures[0].value;
   };
   const getCoverage4NewCode = async () => {
-    const response = await axios.get(
-      `${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_coverage`,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`
-          // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
-        }
-      });
+    const url = `${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_coverage`;
+    const response = await fetch(url);
     return response.data.component.measures[0]?.period.value;
   };
   const getCodeSmells = async () => {
-    const response = await axios.get(
-      `${sonar}/api/measures/component?component=${projectKey}&metricKeys=code_smells`,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`
-          // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
-        }
-      });
+    const url = `${sonar}/api/measures/component?component=${projectKey}&metricKeys=code_smells`;
+    const response = await fetch(url);
     return response.data.component.measures[0].value;
   };
   const getCodeSmells4NewCode = async () => {
-    const response = await axios.get(
-      `${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_code_smells`,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`
-          // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
-        }
-      });
+    const url = `${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_code_smells`;
+    const response = await fetch(url);
     return response.data.component.measures[0]?.period.value;
   };
-  const getSeverity = async () => {
-    const response = await axios.get(
-      `${sonar}/api/issues/search?componentKeys=${projectKey}&facets=severities&resolved=false&s=SEVERITY&ps=1`,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`
-          // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
-        }
-      });
+  const getSeverity = async (type: string) => {
+    const url = `${sonar}/api/issues/search?componentKeys=${projectKey}&facets=severities&resolved=false&s=SEVERITY&ps=1&types=${type}`;
+    const response = await fetch(url);
     return response.data.facets[0].values;
   };
   const getSecurityHotspots = async () => {
-    const response = await axios.get(
-      `${sonar}/api/measures/component?component=${projectKey}&metricKeys=security_hotspots`,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`
-          // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
-        }
-      });
+    const url = `${sonar}/api/measures/component?component=${projectKey}&metricKeys=security_hotspots`;
+    const response = await fetch(url);
     return response.data.component.measures[0].value;
   };
   const getSecurityHotspots4NewCode = async () => {
-    const response = await axios.get(
-      `${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_security_hotspots`,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`
-          // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
-        }
-      });
+    const url = `${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_security_hotspots`;
+    const response = await fetch(url);
     return response.data.component.measures[0]?.period.value;
   };
   const getDuplicatedLinesDensity = async () => {
-    const response = await axios.get(
-      `${sonar}/api/measures/component?component=${projectKey}&metricKeys=duplicated_lines_density`,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`
-          // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
-        }
-      });
+    const url = `${sonar}/api/measures/component?component=${projectKey}&metricKeys=duplicated_lines_density`;
+    const response = await fetch(url);
     return response.data.component.measures[0].value;
   };
   const getDuplicatedLinesDensity4NewCode = async () => {
-    const response = await axios.get(
-      `${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_duplicated_lines_density`,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`
-          // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
-        }
-      });
+    const url = `${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_duplicated_lines_density`;
+    const response = await fetch(url);
     return response.data.component.measures[0]?.period.value;
   };
   const getBugs = async () => {
-    const response = await axios.get(
-      `${sonar}/api/measures/component?component=${projectKey}&metricKeys=bugs`,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`
-          // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
-        }
-      });
+    const url = `${sonar}/api/measures/component?component=${projectKey}&metricKeys=bugs`;
+    const response = await fetch(url);
     return response.data.component.measures[0].value;
   };
   const getBugs4NewCode = async () => {
-    const response = await axios.get(
-      `${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_bugs`,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`
-          // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
-        }
-      });
-    console.log(response)
+    const url = `${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_bugs`;
+    const response = await fetch(url);
     return response.data.component.measures[0]?.period.value;
   };
   const getVulnerabilities = async () => {
-    const response = await axios.get(
-      `${sonar}/api/measures/component?component=${projectKey}&metricKeys=vulnerabilities`,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`
-          // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
-        }
-      });
+    const url = `${sonar}/api/measures/component?component=${projectKey}&metricKeys=vulnerabilities`;
+    const response = await fetch(url);
     return response.data.component.measures[0].value;
   };
   const getVulnerabilities4NewCode = async () => {
-    const response = await axios.get(
-      `${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_vulnerabilities`,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`
-          // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
-        }
-      });
+    const url = `${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_vulnerabilities`;
+    const response = await fetch(url);
     return response.data.component.measures[0]?.period.value;
+  };
+
+  const getMetricKey = async () => {
+    const url = `${sonar}/api/qualitygates/project_status?projectKey=${projectKey}`;
+    const response = await fetch(url);
+    return response.data.projectStatus;
   };
 
   const slack = async (template: any) => {
@@ -171,7 +104,9 @@ export const run = async () => {
     await webhook.send(template);
   }
 
-  const severity = await getSeverity();
+  const severityBugs = await getSeverity("BUG");
+  const severityVulnerabilities = await getSeverity("VULNERABILITY");
+  const severityCodeSmells = await getSeverity("CODE_SMELL");
   let coverage: number
   let codeSmells: number
   let securityHotspots: number
@@ -195,95 +130,172 @@ export const run = async () => {
     vulnerabilities = await getVulnerabilities4NewCode();
   }
   const cognitiveComplexity = await getCognitiveComplexity()
+  const projectStatus = await getMetricKey()
 
-  const getSeverityCount = (type: string) => severity.find((element: any) => element.val === type).count;
-  const getSeverityEmoji = (type: string, threshold: number) => getSeverityCount(type) <= threshold ? ":white_check_mark:" : ":fire:";
-  const getGreaterThanThresholdEmoji = (coverage: number, threshold: number) => coverage >= threshold ? ":white_check_mark:" : ":fire:";
-  const getLessThanThresholdEmoji = (coverage: number, threshold: number) => coverage <= threshold ? ":white_check_mark:" : ":fire:";
+  const getSeverityCount = (severity: any, type: string) => severity.find((element: any) => element.val === type).count;
 
   const mention = (memberId !== "") ? `<@${memberId}>\n\n` : ``;
+
+  const getProjectStatus = () => {
+    const status = ([{
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": `Quality Gate Status : *${projectStatus.status === "OK" ? "Passed" : "Failed"}* ${projectStatus.status === "OK" ? ":white_check_mark:" : ":fire:"}`
+      },
+    }]);
+    const errorConditions = getProjectStatusErrorConditions()
+    return status.concat(errorConditions)
+  };
+  const getProjectStatusErrorConditions = () => {
+    return projectStatus.conditions
+      .filter((element: any) => element.status === "ERROR")
+      .map((v: any) =>
+        (
+          {
+            "type": "section",
+            "text": {
+              "type": "mrkdwn",
+              "text": `*${v.metricKey.toUpperCase()}*  actual: \`${v.actualValue}\`  threshold: \`${v.errorThreshold}\``
+            }
+          }))
+  };
+
   const template = {
     "text": `${mention}*Notification from sonarqube, please fix!*\n${sonar}/dashboard?id=${projectKey}`,
     "attachments": [
       {
-        "color": "#35ef0a",
+        "color": projectStatus.status === "OK" ? "#35ef0a" : "#ef0a3f",
+        "blocks": getProjectStatus()
+      },
+      {
+        "color": "#faf9f8",
         "blocks": [
           {
             "type": "section",
             "text": {
               "type": "mrkdwn",
-              "text": `*Bugs* : *${bugs}*   *Vulnerabilities* : *${vulnerabilities}*`
+              "text": `*Bugs* : *${bugs}*`
             }
           },
           {
             "type": "section",
             "text": {
               "type": "mrkdwn",
-              "text": `*BLOCKER* : *${getSeverityCount('BLOCKER')}* ${getSeverityEmoji('BLOCKER', 0)}  *CRITICAL* : *${getSeverityCount('CRITICAL')}* ${getSeverityEmoji('CRITICAL', 0)}`
+              "text": `Blocker : \`${getSeverityCount(severityBugs, 'BLOCKER')}\`  Critical : \`${getSeverityCount(severityBugs, 'CRITICAL')}\` `
             }
           },
           {
             "type": "section",
             "text": {
               "type": "mrkdwn",
-              "text": `*MAJOR* : *${getSeverityCount('MAJOR')}* ${getSeverityEmoji('MAJOR', 0)}  *MINOR* : *${getSeverityCount('MINOR')}* ${getSeverityEmoji('MINOR', 0)}  *INFO* : *${getSeverityCount('INFO')}* ${getSeverityEmoji('INFO', 0)}`
+              "text": `Major : \`${getSeverityCount(severityBugs, 'MAJOR')}\`  Minor : \`${getSeverityCount(severityBugs, 'MINOR')}\`  Info : \`${getSeverityCount(severityBugs, 'INFO')}\``
             }
-          },
+          }
+        ]
+      },
+      {
+        "color": "#faf9f8",
+        "blocks": [
           {
-            "type": "divider"
+            "type": "section",
+            "text": {
+              "type": "mrkdwn",
+              "text": `*Vulnerabilities* : *${vulnerabilities}*`
+            }
           },
           {
             "type": "section",
             "text": {
               "type": "mrkdwn",
-              "text": `*Security Hotspots* : *${securityHotspots}* ${getLessThanThresholdEmoji(securityHotspots, 0)}`
+              "text": `Blocker : \`${getSeverityCount(severityVulnerabilities, 'BLOCKER')}\`  Critical : \`${getSeverityCount(severityVulnerabilities, 'CRITICAL')}\``
             }
-          },
-          {
-            "type": "divider"
           },
           {
             "type": "section",
             "text": {
               "type": "mrkdwn",
-              "text": `*Coverage* : *${coverage} %* ${getGreaterThanThresholdEmoji(coverage, 80)}`
+              "text": `Major : \`${getSeverityCount(severityVulnerabilities, 'MAJOR')}\`  Minor : \`${getSeverityCount(severityVulnerabilities, 'MINOR')}\`  Info : \`${getSeverityCount(severityVulnerabilities, 'INFO')}\``
             }
-          },
+          }
+        ]
+      },
+      {
+        "color": "#faf9f8",
+        "blocks": [
           {
-            "type": "divider"
+            "type": "section",
+            "text": {
+              "type": "mrkdwn",
+              "text": `*Code Smells* : *${codeSmells}*`
+            }
           },
           {
             "type": "section",
             "text": {
               "type": "mrkdwn",
-              "text": `*Code Smells* : *${codeSmells}* ${getLessThanThresholdEmoji(codeSmells, 10)}`
+              "text": `Blocker : \`${getSeverityCount(severityCodeSmells, 'BLOCKER')}\`  Critical : \`${getSeverityCount(severityCodeSmells, 'CRITICAL')}\``
             }
-          },
-          {
-            "type": "divider"
           },
           {
             "type": "section",
             "text": {
               "type": "mrkdwn",
-              "text": `*Duplicated Lines* : *${duplicatedLinesDensity} %* ${getLessThanThresholdEmoji(duplicatedLinesDensity, 3)}`
+              "text": `Major : \`${getSeverityCount(severityCodeSmells, 'MAJOR')}\`  Minor : \`${getSeverityCount(severityCodeSmells, 'MINOR')}\`  Info : \`${getSeverityCount(severityCodeSmells, 'INFO')}\``
             }
-          },
-          {
-            "type": "divider"
-          },
+          }
+        ]
+      },
+      {
+        "color": "#faf9f8",
+        "blocks": [
           {
             "type": "section",
             "text": {
               "type": "mrkdwn",
-              "text": `*Cognitive Complexity* : *${cognitiveComplexity}* ${getLessThanThresholdEmoji(cognitiveComplexity, 30)}`
+              "text": `*Security Hotspots* : *${securityHotspots}*`
+            }
+          },
+        ]
+      },
+      {
+        "color": "#faf9f8",
+        "blocks": [
+          {
+            "type": "section",
+            "text": {
+              "type": "mrkdwn",
+              "text": `*Coverage* : *${coverage} %*`
+            }
+          },
+        ]
+      },
+      {
+        "color": "#faf9f8",
+        "blocks": [
+          {
+            "type": "section",
+            "text": {
+              "type": "mrkdwn",
+              "text": `*Duplicated Lines* : *${duplicatedLinesDensity} %*`
+            }
+          },
+        ]
+      },
+      {
+        "color": "#faf9f8",
+        "blocks": [
+          {
+            "type": "section",
+            "text": {
+              "type": "mrkdwn",
+              "text": `*Cognitive Complexity* : *${cognitiveComplexity}*`
             }
           }
         ]
       }
     ]
   }
-
   await slack(template)
 };
 
