@@ -25,12 +25,12 @@ export const run = async () => {
   const getCognitiveComplexity = async () => {
     const url = `${sonar}/api/measures/component?component=${projectKey}&metricKeys=cognitive_complexity`;
     const response = await fetch(url);
-    return response.data.component.measures[0].value;
+    return response.data.component.measures[0]?.value;
   };
   const getCoverage = async () => {
     const url = `${sonar}/api/measures/component?component=${projectKey}&metricKeys=coverage`;
     const response = await fetch(url);
-    return response.data.component.measures[0].value;
+    return response.data.component.measures[0]?.value;
   };
   const getCoverage4NewCode = async () => {
     const url = `${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_coverage`;
@@ -40,7 +40,7 @@ export const run = async () => {
   const getCodeSmells = async () => {
     const url = `${sonar}/api/measures/component?component=${projectKey}&metricKeys=code_smells`;
     const response = await fetch(url);
-    return response.data.component.measures[0].value;
+    return response.data.component.measures[0]?.value;
   };
   const getCodeSmells4NewCode = async () => {
     const url = `${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_code_smells`;
@@ -50,7 +50,7 @@ export const run = async () => {
   const getSeverity = async (type: string) => {
     const url = `${sonar}/api/issues/search?componentKeys=${projectKey}&facets=severities&resolved=false&s=SEVERITY&ps=1&types=${type}`;
     const response = await fetch(url);
-    return response.data.facets[0].values;
+    return response.data.facets[0]?.values;
   };
   const getSecurityHotspots = async () => {
     const url = `${sonar}/api/measures/component?component=${projectKey}&metricKeys=security_hotspots`;
@@ -65,7 +65,7 @@ export const run = async () => {
   const getDuplicatedLinesDensity = async () => {
     const url = `${sonar}/api/measures/component?component=${projectKey}&metricKeys=duplicated_lines_density`;
     const response = await fetch(url);
-    return response.data.component.measures[0].value;
+    return response.data.component.measures[0]?.value;
   };
   const getDuplicatedLinesDensity4NewCode = async () => {
     const url = `${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_duplicated_lines_density`;
@@ -75,7 +75,7 @@ export const run = async () => {
   const getBugs = async () => {
     const url = `${sonar}/api/measures/component?component=${projectKey}&metricKeys=bugs`;
     const response = await fetch(url);
-    return response.data.component.measures[0].value;
+    return response.data.component.measures[0]?.value;
   };
   const getBugs4NewCode = async () => {
     const url = `${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_bugs`;
@@ -85,7 +85,7 @@ export const run = async () => {
   const getVulnerabilities = async () => {
     const url = `${sonar}/api/measures/component?component=${projectKey}&metricKeys=vulnerabilities`;
     const response = await fetch(url);
-    return response.data.component.measures[0].value;
+    return response.data.component.measures[0]?.value;
   };
   const getVulnerabilities4NewCode = async () => {
     const url = `${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_vulnerabilities`;
