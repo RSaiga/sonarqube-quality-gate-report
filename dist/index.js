@@ -86,7 +86,7 @@ const run = async () => {
     const getSecurityHotspots = async () => {
         const url = `${sonar}/api/measures/component?component=${projectKey}&metricKeys=security_hotspots`;
         const response = await fetch(url);
-        return response.data.component.measures[0].value;
+        return response.data.component.measures[0]?.value;
     };
     const getSecurityHotspots4NewCode = async () => {
         const url = `${sonar}/api/measures/component?component=${projectKey}&metricKeys=new_security_hotspots`;
@@ -128,6 +128,11 @@ const run = async () => {
         const response = await fetch(url);
         return response.data.projectStatus;
     };
+    const getCognitiveComplexities = async () => {
+        const url = `${sonar}/api/measures/component_tree?component=${projectKey}&strategy=leaves&metricKeys=cognitive_complexity&s=metric&metricSort=cognitive_complexity&asc=false&ps=500`;
+        const response = await fetch(url);
+        console.log(JSON.stringify(response.data));
+    };
     const slack = async (template) => {
         const webhook = new webhook_1.IncomingWebhook(webhookUrl);
         await webhook.send(template);
@@ -160,6 +165,7 @@ const run = async () => {
     const cognitiveComplexity = await getCognitiveComplexity();
     const projectStatus = await getMetricKey();
     const getSeverityCount = (severity, type) => severity.find((element) => element.val === type).count;
+    await getCognitiveComplexities();
     const mention = (memberId !== "") ? `<@${memberId}>\n\n` : ``;
     const getProjectStatus = () => {
         const status = ([{
@@ -318,7 +324,7 @@ const run = async () => {
             }
         ]
     };
-    await slack(template);
+    // await slack(template)
 };
 exports.run = run;
 (0, exports.run)();
