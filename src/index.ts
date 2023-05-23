@@ -5,6 +5,8 @@ import 'dotenv/config'
 
 export const run = async () => {
   const sonar = process.env.SONAR ?? core.getInput('sonar')
+  const pull_req_url = process.env.PULL_REQ_URL ?? core.getInput('pullReqUrl')
+  const pull_req_title = process.env.PULL_REQ_TITLE ?? core.getInput('pullReqTitle')
   const projectKey = process.env.PROJECT_KEY ?? core.getInput('projectKey');
   const token = process.env.PROJECT_KEY ?? core.getInput('token');
   const onNewCode = process.env.ON_NEW_CODE ?? core.getInput('onNewCode');
@@ -169,7 +171,7 @@ export const run = async () => {
   };
 
   const template = {
-    "text": `${mention}*Notification from sonarqube, please fix!*\n${sonar}/dashboard?id=${projectKey}`,
+    "text": `${mention}*Notification from sonarqube, please fix!*\n${sonar}/dashboard?id=${projectKey}\n${pull_req_title}\n${pull_req_url}`,
     "attachments": [
       {
         "color": projectStatus.status === "OK" ? "#35ef0a" : "#ef0a3f",
@@ -303,7 +305,7 @@ export const run = async () => {
       }
     ]
   }
-  // await slack(template)
+  await slack(template)
 };
 
 run()
