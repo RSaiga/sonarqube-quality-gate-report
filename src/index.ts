@@ -18,8 +18,8 @@ export const run = async () => {
       url,
       {
         headers: {
-          'Authorization': `Bearer ${token}`
-          // 'Authorization': 'Basic ' + Buffer.from('admin' + ':' + '19820101').toString('base64')
+          // 'Authorization': `Bearer ${token}`
+          'Authorization': 'Basic ' + btoa(`${token}:`)
         }
       });
   }
