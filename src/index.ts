@@ -8,7 +8,7 @@ export const run = async () => {
   const pull_req_url = process.env.PULL_REQ_URL ?? core.getInput('pullReqUrl')
   const pull_req_title = process.env.PULL_REQ_TITLE ?? core.getInput('pullReqTitle')
   const projectKey = process.env.PROJECT_KEY ?? core.getInput('projectKey');
-  const token = process.env.PROJECT_KEY ?? core.getInput('token');
+  const token = process.env.TOKEN ?? core.getInput('token');
   const onNewCode = process.env.ON_NEW_CODE ?? core.getInput('onNewCode');
   const webhookUrl = process.env.WEBHOOK ?? core.getInput('webhook');
   const memberId = process.env.MEMBER_ID ?? core.getInput('memberId');
