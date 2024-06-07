@@ -25,5 +25,5 @@ inputs:
     required: true
     description: 'slack mention'
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'
